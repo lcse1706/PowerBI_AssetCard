@@ -4,7 +4,7 @@
     "displayName": "AssetCard",
     "guid": "assetCardF6C87CAA832A42FBBFBF7E66B8C15578",
     "visualClassName": "Visual",
-    "version": "1.0.1.1",
+    "version": "1.0.1.2",
     "description": "Custom Cards to represent machine asset",
     "supportUrl": "https://github.com/lcse1706/PowerBI_AssetCard",
     "gitHubUrl": "https://github.com/lcse1706/PowerBI_AssetCard"
