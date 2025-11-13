@@ -1,0 +1,25 @@
+{
+  "visual": {
+    "name": "assetCard",
+    "displayName": "AssetCard",
+    "guid": "assetCardF6C87CAA832A42FBBFBF7E66B8C15578",
+    "visualClassName": "Visual",
+    "version": "1.0.1.1",
+    "description": "Custom Cards to represent machine asset",
+    "supportUrl": "https://github.com/lcse1706/PowerBI_AssetCard",
+    "gitHubUrl": "https://github.com/lcse1706/PowerBI_AssetCard"
+  },
+  "apiVersion": "5.3.0",
+  "author": {
+    "name": "Lukasz Czarniecki",
+    "email": "lcse.2001@gmail.com"
+  },
+  "assets": {
+    "icon": "assets/icon.png"
+  },
+  "externalJS": null,
+  "style": "style/visual.less",
+  "capabilities": "capabilities.json",
+  "dependencies": null,
+  "stringResources": []
+}

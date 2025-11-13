@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "allowJs": false,
+        "jsx": "react",
+        "types": ["react", "react-dom"],
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "module": "ES2020",
+        "target": "ES2020",
+        "sourceMap": true,
+        "outDir": "./.tmp/build/",
+        "moduleResolution": "node",
+        "declaration": true,
+        "lib": [
+            "es2020",
+            "dom"
+        ]
+    },
+    "files": [
+        "./src/visual.ts"
+    ]
+}
