@@ -10,3 +10,9 @@ It highlights key performance indicators with color-coded status, tooltips, and 
 - Drill-through support via right-click menu
 - Enhanced tooltips to reveal additional details
 - Lightweight and optimized for large datasets and dashboards
+
+➡ License
+
+Based on "Power BI Custom Visuals CircleCard" sample © Microsoft Corporation
+Licensed under the MIT License (see LICENSE file for details).
+Modified by Lukasz Czarniecki © 2025
