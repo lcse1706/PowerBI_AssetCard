@@ -110,7 +110,8 @@ export class AssetCard implements IVisual {
         Settings,
         options.dataViews
       );
-    const circle = this.settings.circle;
+    // const circle = this.settings.circle;
+    const fontSize = this.settings.assetSettings.fontSize.value;
 
     // Data
     const catCol = dv.categorical.categories?.[0];
@@ -139,12 +140,13 @@ export class AssetCard implements IVisual {
     // Render React
     AssetComp.update({
       size,
-      //   borderWidth: circle?.circleThickness?.value ?? undefined,
+      // borderWidth: circle?.circleThickness?.value ?? undefined,
       //   background: circle?.circleColor?.value?.value ?? undefined,
       assetTextLabel: assetLabel,
       assetTextValue: assetValue,
       valueTextLabel: valueLabel,
       valueTextValue: valueText,
+      fontSize: fontSize,
     });
 
     // Tooltips on root

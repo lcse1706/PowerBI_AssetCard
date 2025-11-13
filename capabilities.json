@@ -37,21 +37,11 @@
   },
 
   "objects": {
-    "circle": {
-      "displayName": "Circle",
+    "assetSettings": {
+      "displayName": "Asset Settings",
       "properties": {
-        "circleColor": {
-          "displayName": "Color",
-          "description": "Background color of the card.",
-          "type": {
-            "fill": {
-              "solid": { "color": true }
-            }
-          }
-        },
-        "circleThickness": {
-          "displayName": "Border thickness",
-          "description": "Border thickness of the card.",
+        "fontSize": {
+          "displayName": "Font Size",
           "type": { "numeric": true }
         }
       }
