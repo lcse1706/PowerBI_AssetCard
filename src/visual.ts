@@ -41,7 +41,6 @@ import './../style/visual.less';
 export class AssetCard implements IVisual {
   private target: HTMLElement;
   private reactRoot: React.ComponentElement<any, any>;
-
   private settings: Settings;
   private viewport: IViewport;
   private formattingSettingsService: FormattingSettingsService;
@@ -54,8 +53,8 @@ export class AssetCard implements IVisual {
   private selectionManager: ISelectionManager;
   private currentSelectionId: ISelectionId | null = null;
   private currentTooltip: VisualTooltipDataItem[] = [];
-  private isSelected = false; // for simple style toggle
-  private handleContextMenu: () => void;
+  // private isSelected = false; // for simple style toggle
+  // private handleContextMenu: () => void;
 
   constructor(options: VisualConstructorOptions) {
     // Host services (selection, tooltips, localization)
@@ -86,7 +85,7 @@ export class AssetCard implements IVisual {
     document.addEventListener('click', ev => {
       if (!this.target.contains(ev.target as Node)) {
         this.selectionManager.clear();
-        this.isSelected = false;
+        // this.isSelected = false;
         // this.applySelectionStyle();
       }
     });
@@ -140,11 +139,7 @@ export class AssetCard implements IVisual {
     // Render React
     AssetComp.update({
       size,
-      // borderWidth: circle?.circleThickness?.value ?? undefined,
-      //   background: circle?.circleColor?.value?.value ?? undefined,
-      assetTextLabel: assetLabel,
       assetTextValue: assetValue,
-      valueTextLabel: valueLabel,
       valueTextValue: valueText,
       fontSize: fontSize,
     });
@@ -165,23 +160,6 @@ export class AssetCard implements IVisual {
    * Attach click and contextmenu handlers to support selection & drill-through.
    */
   private attachInteractions() {
-    // Left click: select / multi-select (Ctrl/Cmd)
-    // this.target.onclick = async (ev: MouseEvent) => {
-    //   if (!this.currentSelectionId) return;
-    //   const selected = await this.selectionManager.select(
-    //     this.currentSelectionId
-    //   );
-    //   // selected: array of currently selected IDs -> mark if ours is among them
-    //   // ISelectionId type doesn't declare 'equals' — cast to any for the runtime method.
-    //   this.isSelected = !!selected?.some(id =>
-    //     (id as any).equals(this.currentSelectionId)
-    //   );
-    //   //   //   this.applySelectionStyle();
-
-    //   // Prevent bubbling to document (so we don't clear immediately)
-    //   ev.stopPropagation();
-    // };
-
     // Right click: show Power BI context menu (contains Drill-through)
     this.target.oncontextmenu = (ev: MouseEvent) => {
       ev.preventDefault();
@@ -199,6 +177,9 @@ export class AssetCard implements IVisual {
         y: ev.clientY,
       });
     };
+
+    // Left click: select / deselect
+
     // this.target.onclick = (ev: MouseEvent) => {
     //   ev.preventDefault();
     //   ev.stopPropagation();
@@ -211,21 +192,10 @@ export class AssetCard implements IVisual {
     // };
   }
 
-  //  Apply visual style based on selection state
-
-  //   private applySelectionStyle() {
-  //     if (this.isSelected) {
-  //       this.target.classList.add('selected');
-  //     } else {
-  //       this.target.classList.remove('selected');
-  //     }
-  //   }
-
   private clear() {
     this.currentTooltip = [];
     this.currentSelectionId = null;
-    this.isSelected = false;
-    // this.applySelectionStyle();
+    // this.isSelected = false;
     AssetComp.update(initialState);
   }
 

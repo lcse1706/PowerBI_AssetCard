@@ -8,21 +8,15 @@
 import * as React from 'react';
 
 export interface State {
-  assetTextLabel: string;
   assetTextValue: string;
-  valueTextLabel: string;
   valueTextValue: string;
   size: number;
-  background?: string;
-  borderWidth?: number;
   fontSize?: number;
 }
 
 export const initialState: State = {
-  assetTextLabel: '',
-  assetTextValue: '',
-  valueTextLabel: '',
-  valueTextValue: '',
+  assetTextValue: 'Asset Number',
+  valueTextValue: 'KPI',
   size: 200,
 };
 
@@ -54,21 +48,15 @@ export class AssetComp extends React.Component<object, State> {
 
   render() {
     const {
-      assetTextLabel,
       assetTextValue,
-      valueTextLabel,
       valueTextValue,
-      size,
-      background,
-      borderWidth,
+      // size,
       fontSize,
     } = this.state;
 
     const style: React.CSSProperties = {
       // width: size,
       // height: size,
-      // background,
-      // borderWidth,
       fontSize: fontSize,
     };
 
@@ -82,7 +70,7 @@ export class AssetComp extends React.Component<object, State> {
         </p>
         <button className="info-btn">
           <svg
-            xmlns="http://www.w3.org/2000/svg"
+            xmlns="https://www.w3.org/2000/svg"
             height="20px"
             viewBox="0 -960 960 960"
             width="20px"
