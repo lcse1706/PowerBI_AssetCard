@@ -16,3 +16,7 @@ It highlights key performance indicators with color-coded status, tooltips, and 
 Based on "Power BI Custom Visuals CircleCard" sample © Microsoft Corporation
 Licensed under the MIT License (see LICENSE file for details).
 Modified by Lukasz Czarniecki © 2025
+
+➡ Support:
+
+https://github.com/lcse1706/PowerBI_AssetCard/issues
