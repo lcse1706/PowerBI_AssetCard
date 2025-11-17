@@ -5,14 +5,14 @@
     "guid": "assetCardD5D182153530",
     "visualClassName": "Visual",
     "version": "1.0.0.1",
-    "description": "Custom Cards to represent machine asset",
-    "supportUrl": "https://github.com/lcse1706/PowerBI_AssetCard",
+    "description": "Custom Cards to represent machine asset. Display asset number and value with customizable font size. Ideal for dashboards showcasing equipment status or performance metrics. Page tooltips enabled for enhanced interactivity. Right-click to drill through data.",
+    "supportUrl": "https://github.com/lcse1706/PowerBI_AssetCard/issues",
     "gitHubUrl": "https://github.com/lcse1706/PowerBI_AssetCard"
   },
   "apiVersion": "5.3.0",
   "author": {
     "name": "Lukasz Czarniecki",
-    "email": "lcse.2001@gmail.com"
+    "email": "lukasz.czarniecki@scania.com"
   },
   "assets": {
     "icon": "assets/icon.png"
