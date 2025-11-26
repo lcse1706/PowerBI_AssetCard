@@ -53,8 +53,6 @@ export class AssetCard implements IVisual {
   private selectionManager: ISelectionManager;
   private currentSelectionId: ISelectionId | null = null;
   private currentTooltip: VisualTooltipDataItem[] = [];
-  // private isSelected = false; // for simple style toggle
-  // private handleContextMenu: () => void;
 
   constructor(options: VisualConstructorOptions) {
     // Host services (selection, tooltips, localization)
@@ -81,12 +79,10 @@ export class AssetCard implements IVisual {
       this.target
     );
 
-    // Optional: clear selection when clicking blank area of the report
+    // Clear selection when clicking poza visualem
     document.addEventListener('click', ev => {
       if (!this.target.contains(ev.target as Node)) {
         this.selectionManager.clear();
-        // this.isSelected = false;
-        // this.applySelectionStyle();
       }
     });
   }
@@ -109,8 +105,9 @@ export class AssetCard implements IVisual {
         Settings,
         options.dataViews
       );
-    // const circle = this.settings.circle;
+
     const fontSize = this.settings.assetSettings.fontSize.value;
+    const enableFiltering = this.settings.assetSettings.enableFiltering.value;
 
     // Data
     const catCol = dv.categorical.categories?.[0];
@@ -124,7 +121,7 @@ export class AssetCard implements IVisual {
     const valueRaw = valCol?.values?.[0];
     const valueText = valueRaw == null ? '' : String(valueRaw);
 
-    // Build SelectionId for the first row (single card scenario)
+    // SelectionId for first row (single card)
     this.currentSelectionId = this.host
       .createSelectionIdBuilder()
       .withCategory(catCol, 0)
@@ -144,7 +141,7 @@ export class AssetCard implements IVisual {
       fontSize: fontSize,
     });
 
-    // Tooltips on root
+    // Tooltips on info icon
     const sel = d3.select(this.target).selectAll('.info-btn');
     this.tooltipServiceWrapper.addTooltip(
       sel,
@@ -152,18 +149,31 @@ export class AssetCard implements IVisual {
       () => this.currentSelectionId
     );
 
-    // Wire up interactions (click = select, right-click = drill-through menu)
-    this.attachInteractions();
+    // Interakcje (filter + drill-through)
+    this.attachInteractions(enableFiltering);
   }
 
   /**
    * Attach click and contextmenu handlers to support selection & drill-through.
    */
-  private attachInteractions() {
-    // Right click: show Power BI context menu (contains Drill-through)
+  private attachInteractions(enableFiltering: boolean) {
+    // LEWY KLIK – filtruje inne visuale (Filter out)
+    this.target.onclick = async (ev: MouseEvent) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (!this.currentSelectionId) return;
+
+      if (enableFiltering) {
+        await this.selectionManager.select(this.currentSelectionId, false);
+      }
+      // jeśli enableFiltering = false → nic nie robimy (brak filtrowania)
+    };
+
+    // PRAWY KLIK – context menu z Drill through (jak w działającej wersji)
     this.target.oncontextmenu = (ev: MouseEvent) => {
       ev.preventDefault();
       ev.stopPropagation();
+
       if (!this.currentSelectionId) {
         this.selectionManager.showContextMenu(undefined as any, {
           x: ev.clientX,
@@ -172,30 +182,17 @@ export class AssetCard implements IVisual {
         return;
       }
 
+      // Używamy tego samego wywołania, które wcześniej dawało Drill through
       (this.selectionManager as any).showContextMenu(this.currentSelectionId, {
         x: ev.clientX,
         y: ev.clientY,
       });
     };
-
-    // Left click: select / deselect
-
-    // this.target.onclick = (ev: MouseEvent) => {
-    //   ev.preventDefault();
-    //   ev.stopPropagation();
-    //   if (!this.currentSelectionId) return;
-
-    //   this.selectionManager.showContextMenu([this.currentSelectionId], {
-    //     x: ev.clientX,
-    //     y: ev.clientY,
-    //   });
-    // };
   }
 
   private clear() {
     this.currentTooltip = [];
     this.currentSelectionId = null;
-    // this.isSelected = false;
     AssetComp.update(initialState);
   }
 

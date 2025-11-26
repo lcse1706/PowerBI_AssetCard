@@ -32,8 +32,7 @@
     "supportedTypes": {
       "default": true,
       "canvas": true
-    },
-    "roles": ["tooltips"]
+    }
   },
 
   "objects": {
@@ -43,6 +42,10 @@
         "fontSize": {
           "displayName": "Font Size",
           "type": { "numeric": true }
+        },
+        "enableFiltering": {
+          "displayName": "Filter other visuals",
+          "type": { "bool": true }
         }
       }
     }
