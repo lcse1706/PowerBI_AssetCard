@@ -27,6 +27,7 @@ import IViewport = powerbi.IViewport;
 import ISelectionId = powerbi.extensibility.ISelectionId;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+import IVisualEventService = powerbi.extensibility.IVisualEventService;
 
 // Internal imports
 import { AssetComp, initialState } from './component';
@@ -45,7 +46,7 @@ export class AssetCard implements IVisual {
   private viewport: IViewport;
   private formattingSettingsService: FormattingSettingsService;
   private localizationManager: ILocalizationManager;
-
+  private events?: IVisualEventService;
   private host: powerbi.extensibility.visual.IVisualHost;
   private tooltipServiceWrapper: ITooltipServiceWrapper;
 
@@ -55,6 +56,7 @@ export class AssetCard implements IVisual {
   private currentTooltip: VisualTooltipDataItem[] = [];
 
   constructor(options: VisualConstructorOptions) {
+    this.events = options.host.eventService;
     // Host services (selection, tooltips, localization)
     this.host = options.host;
     this.selectionManager = this.host.createSelectionManager();
@@ -88,76 +90,83 @@ export class AssetCard implements IVisual {
   }
 
   public update(options: VisualUpdateOptions) {
-    const dv: DataView | undefined = options.dataViews && options.dataViews[0];
-    if (!dv || !dv.categorical) {
-      this.clear();
-      return;
-    }
+    this.events?.renderingStarted(options);
 
-    // Viewport
-    this.viewport = options.viewport;
-    const { width, height } = this.viewport;
-    const size = Math.min(width, height);
+    try {
+      const dv: DataView | undefined =
+        options.dataViews && options.dataViews[0];
+      if (!dv || !dv.categorical) {
+        this.clear();
+        return;
+      }
 
-    // Formatting pane
-    this.settings =
-      this.formattingSettingsService.populateFormattingSettingsModel(
-        Settings,
-        options.dataViews
+      // Viewport
+      this.viewport = options.viewport;
+      const { width, height } = this.viewport;
+      const size = Math.min(width, height);
+
+      // Formatting pane
+      this.settings =
+        this.formattingSettingsService.populateFormattingSettingsModel(
+          Settings,
+          options.dataViews
+        );
+
+      const fontSize = this.settings.assetSettings.fontSize.value;
+      const enableFiltering = this.settings.assetSettings.enableFiltering.value;
+
+      // Data
+      const catCol = dv.categorical.categories?.[0];
+      const valCol = dv.categorical.values?.[0];
+
+      const assetLabel = catCol?.source?.displayName ?? 'Asset';
+      const assetValue =
+        catCol?.values?.[0] != null ? String(catCol.values[0]) : '';
+
+      const valueLabel = valCol?.source?.displayName ?? 'Value';
+      const valueRaw = valCol?.values?.[0];
+      const valueText = valueRaw == null ? '' : String(valueRaw);
+
+      // SelectionId for first row (single card)
+      this.currentSelectionId = this.host
+        .createSelectionIdBuilder()
+        .withCategory(catCol, 0)
+        .createSelectionId();
+
+      // Tooltip content
+      this.currentTooltip = [
+        { displayName: assetLabel, value: assetValue },
+        { displayName: valueLabel, value: valueText },
+      ];
+
+      // Render React
+      AssetComp.update({
+        size,
+        assetTextValue: assetValue,
+        valueTextValue: valueText,
+        fontSize: fontSize,
+      });
+
+      // Tooltips on info icon
+      const sel = d3.select(this.target).selectAll('.info-btn');
+      this.tooltipServiceWrapper.addTooltip(
+        sel,
+        () => this.currentTooltip,
+        () => this.currentSelectionId
       );
 
-    const fontSize = this.settings.assetSettings.fontSize.value;
-    const enableFiltering = this.settings.assetSettings.enableFiltering.value;
-
-    // Data
-    const catCol = dv.categorical.categories?.[0];
-    const valCol = dv.categorical.values?.[0];
-
-    const assetLabel = catCol?.source?.displayName ?? 'Asset';
-    const assetValue =
-      catCol?.values?.[0] != null ? String(catCol.values[0]) : '';
-
-    const valueLabel = valCol?.source?.displayName ?? 'Value';
-    const valueRaw = valCol?.values?.[0];
-    const valueText = valueRaw == null ? '' : String(valueRaw);
-
-    // SelectionId for first row (single card)
-    this.currentSelectionId = this.host
-      .createSelectionIdBuilder()
-      .withCategory(catCol, 0)
-      .createSelectionId();
-
-    // Tooltip content
-    this.currentTooltip = [
-      { displayName: assetLabel, value: assetValue },
-      { displayName: valueLabel, value: valueText },
-    ];
-
-    // Render React
-    AssetComp.update({
-      size,
-      assetTextValue: assetValue,
-      valueTextValue: valueText,
-      fontSize: fontSize,
-    });
-
-    // Tooltips on info icon
-    const sel = d3.select(this.target).selectAll('.info-btn');
-    this.tooltipServiceWrapper.addTooltip(
-      sel,
-      () => this.currentTooltip,
-      () => this.currentSelectionId
-    );
-
-    // Interakcje (filter + drill-through)
-    this.attachInteractions(enableFiltering);
+      // Interactions (filter + drill-through)
+      this.attachInteractions(enableFiltering);
+    } finally {
+      this.events?.renderingFinished(options);
+    }
   }
 
   /**
    * Attach click and contextmenu handlers to support selection & drill-through.
    */
   private attachInteractions(enableFiltering: boolean) {
-    // LEWY KLIK – filtruje inne visuale (Filter out)
+    // LEFT CLICK – filters other visuals (Filter out)
     this.target.onclick = async (ev: MouseEvent) => {
       ev.preventDefault();
       ev.stopPropagation();
@@ -166,10 +175,9 @@ export class AssetCard implements IVisual {
       if (enableFiltering) {
         await this.selectionManager.select(this.currentSelectionId, false);
       }
-      // jeśli enableFiltering = false → nic nie robimy (brak filtrowania)
     };
 
-    // PRAWY KLIK – context menu z Drill through (jak w działającej wersji)
+    // RIGHT CLICK – context menu with Drill through (as in the working version)
     this.target.oncontextmenu = (ev: MouseEvent) => {
       ev.preventDefault();
       ev.stopPropagation();
@@ -182,7 +190,7 @@ export class AssetCard implements IVisual {
         return;
       }
 
-      // Używamy tego samego wywołania, które wcześniej dawało Drill through
+      // We use the same call that previously provided Drill through
       (this.selectionManager as any).showContextMenu(this.currentSelectionId, {
         x: ev.clientX,
         y: ev.clientY,
